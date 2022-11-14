@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pickmeup.mapper.ReviewMapper">
+	
+	<insert id="addComment" parameterType="com.pickmeup.model.Review">
+		insert into values(null,#{rv_Content},0,#{mem_Id},40)
+	</insert>
+	
+	<insert id="insertReview" parameterType="com.pickmeup.model.Review">
+		insert into t_review values(null,#{review.rv_Content},#{review.rv_Rating},#{id},#{review.pro_Num})
+	</insert>
+
+	<select id="selectOtherReview" resultType="com.pickmeup.model.Review">
+	select t.rv_content as "rv_Content", t.rv_rating as "rv_Rating", t.mem_id as "mem_Id", t.pro_num as "pro_Num", avg(t.rv_rating) as "sum_rv_Rating",
+	(select pro_name from t_product where pro_num = t.pro_num) as "pro_Name" 
+	from t_review t where pro_num in(select pro_num from t_product where mem_id = #{id})
+	group by t.rv_content, t.rv_rating, t.mem_id, t.pro_num
+	</select>
+	
+	<select id="selectMyReview" resultType="com.pickmeup.model.Review">
+	select t.rv_content as "rv_Content", t.rv_rating as "rv_Rating", t.mem_id as "mem_Id", t.pro_num as "pro_Num", 
+	(select pro_name from t_product where pro_num = t.pro_num) as "pro_Name" 
+	from t_review t where mem_id = #{id}
+	</select>
+	
+	<select id="selectSumRating" resultType="float">
+	select avg(rv_rating) from t_review where pro_num in(select pro_num from t_product where mem_id = #{id})
+	</select>
+
+
+</mapper>

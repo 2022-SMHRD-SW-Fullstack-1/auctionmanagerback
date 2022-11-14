@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pickmeup.mapper.MypageMapper">
+
+	<select id="selectAllBid" resultType="com.pickmeup.model.Winning_bid">
+	select a.pro_num as "pro_Num", a.wb_price as "wb_Price", a.pay_deadline as "Pay_Deadline", b.pro_name as "pro_Name", b.pro_deadline as "pro_Deadline",
+	a.pay_check as "Pay_Check", a.delivery_check as "delivery_Check"
+	from t_winning_bid a, t_product b where a.pro_num = b.pro_num and a.mem_id=#{id}
+	</select>
+	
+	<select id="selectAllPro" resultType="com.pickmeup.model.Product">
+	select b.pro_num as "pro_Num", b.pro_name as "pro_Name", count(c.mem_id) as "pro_Participants", max(c.auc_price) as "auc_price",
+	b.pro_deadline as "pro_Deadline"
+	from t_product b, t_auction c WHERE b.mem_id=#{id} and b.pro_num = c.pro_num
+	group by b.pro_num, b.pro_name, b.pro_deadline
+	</select>
+	
+	<select id="selectSequence" resultType="com.pickmeup.model.Winning_bid">
+	select rownum as "sequence" from (select b.pro_num as "pro_Num", b.pro_name as "pro_Name", count(c.mem_id) as "pro_Participants", max(c.auc_price) as "auc_price",
+	b.pro_deadline as "pro_Deadline"
+	from t_product b, t_auction c WHERE b.mem_id=#{id} and b.pro_num = c.pro_num
+	group by b.pro_num, b.pro_name, b.pro_deadline) vi 
+	</select>
+	
+	<select id="selectBidInfo" resultType="com.pickmeup.model.Winning_bid">
+	select wb_delivery_addr as "wb_Delivery_Addr", delivery_check as "delivery_Check", pay_check as "Pay_Check"
+	from t_winning_bid where pro_num = #{num}
+	</select>
+	
+	<update id="setPayCheck">
+	update t_winning_bid set delivery_check = 'y' where pro_num=#{num}
+	</update>
+	
+	<update id="setCalculate">
+	update t_member set mem_pickmoney = mem_pickmoney+(select pay_settlement from t_winning_bid where pro_num = #{num}) where mem_id = #{id}
+	</update>
+	
+	<update id="CalculateSuccess">
+	update t_winning_bid set pay_settlement = 0 where pro_num = #{num}
+	</update>
+	
+	<select id="selectDeadlineList" resultType="com.pickmeup.model.Product">
+	select pro_deadline as "Deadline" from t_product
+	</select>
+	
+	<select id="selectDeadPro" resultType="com.pickmeup.model.Winning_bid">
+	SELECT DISTINCT b.PRO_NUM AS "pro_Num", (SELECT c.auc_price FROM T_AUCTION c WHERE c.pro_num = b.pro_num and (c.pro_num,c.auc_price) in(SELECT pro_num, max(auc_price) FROM t_auction GROUP BY pro_num)) AS "wb_Price", 
+	(SELECT c.mem_id FROM T_AUCTION c WHERE c.pro_num = b.pro_num and (c.pro_num,c.auc_price) in(SELECT pro_num, max(auc_price) FROM t_auction GROUP BY pro_num))AS "mem_Id",
+	a.PRO_DEADLINE+3 AS "pay_Deadline"
+	FROM T_PRODUCT a, T_AUCTION b
+	WHERE a.pro_num = b.pro_num AND a.PRO_DEADLINE &lt;= TO_DATE(#{date},'YYYY-MM-DD HH24:MI:SS')
+	</select>
+	
+	<select id="selectBidCheck" resultType="int">
+	select count(rownum) from t_Winning_bid where pro_num = #{num}
+	</select>
+	
+	<insert id="setBidList" parameterType="com.pickmeup.model.Winning_bid">
+		INSERT INTO t_winning_bid values(NULL,#{pro_Num},#{wb_Price},#{mem_Id},NULL,default,
+		TO_DATE(#{Pay_Deadline}, 'YYYY-MM-DD HH24:MI:SS'),Null,default)
+	</insert>
+</mapper>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pickmeup.mapper.ProductMapper">
+	
+	<!-- 상품등록 -->
+	<insert id="addPro">
+		insert into t_product 
+		values(null, #{mem_Id}, #{pro_Name}, #{pro_Min_Price}, localtimestamp + 7, #{pro_Desc}, #{pro_Brand}, #{pro_Category}, #{pro_Status}, #{pro_Photo})
+	</insert>
+
+	<insert id="addAuc">
+		<selectKey resultType="int" keyProperty="pro_Num" order="BEFORE">
+			select max(pro_Num) from t_product
+		</selectKey>
+			insert into t_auction
+			values(null, #{mem_Id}, #{auc_Price}, localtimestamp, #{pro_Num}, #{auc_Deposit})
+	</insert> 
+	
+	<!-- 메인에 마감 임박 상품 나열 -->
+	<!-- <select id="soonList" parameterType="com.pickmeup.model.Product" resultType="com.pickmeup.model.Product">
+		select * from t_product
+	</select> -->
+	
+</mapper>

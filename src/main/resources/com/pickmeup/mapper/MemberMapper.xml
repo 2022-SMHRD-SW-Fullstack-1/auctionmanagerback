@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pickmeup.mapper.MemberMapper">
+
+	<select id="idCheck" resultType="String">
+		select mem_id from t_member where mem_id=#{id}
+	</select>
+
+	<!-- 회원가입 -->
+	<insert id="joinMember" parameterType="com.pickmeup.model.Member">
+		insert into t_member values(#{id}, #{pw}, #{name}, #{nick}, #{birthday}, #{gender}, #{addr}, 0, null, null, null, localtimestamp, 1, #{phone})
+	</insert>
+
+	<select id="viewMyPage" parameterType="String" resultType="com.pickmeup.model.Member">
+		select * from t_member where mem_id=#{id}	
+	</select>
+	
+	<select id="getPickMoney" resultType="int">
+		select mem_pickmoney from
+		t_member where mem_id=#{memId}
+	</select>
+	
+	<select id="getNick" resultType="String">
+		select mem_Nick from t_member
+		where mem_id=#{memId}
+	</select>
+	
+	<select id="getAddr" resultType="String">
+		select mem_Addr from t_member
+		where mem_id=#{memId}
+	</select>
+	
+	<select id="getPhoto" resultType="String">
+		select pro_photo from t_product
+		where pro_num=#{pronum}
+	</select>
+	<select id="getName" resultType="String">
+		select pro_name from t_product
+		where pro_num=#{pronum}
+	</select>
+	<select id="getMem" resultType="String">
+		select mem_id from t_product
+		where pro_num=#{pronum}
+	</select>
+	<select id="getPay" resultType="int">
+		select wb_price from t_winning_bid
+		where pro_num=#{pronum}
+	</select>
+		<select id="getDepo" resultType="int">
+		select auc_deposit from t_auction
+		where pro_num=#{pronum}
+	</select>
+	
+	<update id="setPickMoney">
+		update t_member set mem_pickmoney=#{money} where
+		mem_id=#{memId}
+	</update>
+	
+	<update id="setAddr">
+		update t_member set mem_Addr=#{Addr} where
+		mem_id=#{memId}
+	</update>
+	
+	<update id="updateSettle">
+		update t_winning_bid set pay_settlement=#{money} where
+		pro_num=#{num}
+	</update>
+	
+	<update id="PayMoney">
+		update t_member set mem_pickmoney= mem_pickmoney - #{money} where
+		mem_id=#{memId}
+	</update>
+	
+	<update id="changeInfo"
+		parameterType="com.pickmeup.model.Member">
+		update t_member set mem_pw=#{member.mem_Pw},
+		mem_Nick=#{member.mem_Pw},
+		mem_Addr=#{member.mem_Addr} where
+		mem_id=#{memId}
+	</update>
+	
+	<update id="insertAddr">
+		update t_winning_bid set wb_delivery_addr=(select mem_addr from t_member where mem_id=#{memId}), pay_check='y' where mem_id=#{memId} and pro_num=#{num}
+	</update>
+	
+</mapper>
