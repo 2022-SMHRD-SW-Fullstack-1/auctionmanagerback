@@ -86,4 +86,9 @@ public class MypageService {
 	public int selectBidCheck(int num) {
 		return mypageMapper.selectBidCheck(num);
 	}
+	
+	// id에 대한 참여중인 입찰정도 전부 가져오기
+		public List<Product> selectAllBiding(String id){
+			return mypageMapper.selectAllBiding(id);
+		}
 }

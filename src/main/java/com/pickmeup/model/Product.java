@@ -67,4 +67,7 @@ public class Product {
     // 날짜용 데이터
     private Date Deadline;
     
+    // 나의 입찰가
+    private int my_auc_Price;
+    
 }

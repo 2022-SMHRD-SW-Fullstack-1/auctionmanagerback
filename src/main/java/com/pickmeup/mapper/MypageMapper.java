@@ -51,4 +51,7 @@ public interface MypageMapper {
 	
 	public int selectBidCheck(int num);
 	
+	// 입찰정보
+		public List<Product> selectAllBiding(String id);
+	
 }

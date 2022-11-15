@@ -27,35 +27,16 @@ public class MypageController {
 
 	@Autowired
 	MypageService mypageService;
-
-	// 판매중인 정보들에 대해 리스트로 만들어 프론트로 리턴한다.
-	@GetMapping("/mypage/sell/{memid}")
-	public List<Product> sellList(@PathVariable("memid") String id) {
-		
-		List<Product> proList = mypageService.selectAllPro(id);
-		
-		//상품리스트 사이즈만큼의 추가해줄 리스트 생성(시퀀스 개념이용)
-		List<Winning_bid> infoList = mypageService.selectSequence(id);
-
-		for(int a=0; a<proList.size(); a++) {//낙찰되어 있는 상품이면 낙찰정보 추가후 상품리스트에 담기
+	
+	//입찰참여중인 정보들에 대해 리스트로 만들어 프론트로 리턴
+		@GetMapping("/mypage/biding/{memid}")
+		public List<Product> bidingList(@PathVariable("memid")String id){
+			List<Product> mybidingList = mypageService.selectAllBiding(id);
 			
-		if(mypageService.selectBidInfo(proList.get(a).getPro_Num()).isEmpty()==false) {//낙찰된 상품의 경우 결제정보,구매확정여부,배송지 정보 넣어준다. 낙찰되지않았으면 걍 넘김  
-			
-			infoList.get(a).setPay_Check(mypageService.selectBidInfo(proList.get(a).getPro_Num()).get(0).getPay_Check());
-			infoList.get(a).setWb_Delivery_Addr(mypageService.selectBidInfo(proList.get(a).getPro_Num()).get(0).getWb_Delivery_Addr());
-			infoList.get(a).setDelivery_Check(mypageService.selectBidInfo(proList.get(a).getPro_Num()).get(0).getDelivery_Check());
-			
-			proList.get(a).setPay_Check(infoList.get(a).getPay_Check());
-			proList.get(a).setWb_Delivery_Addr(infoList.get(a).getWb_Delivery_Addr());
-			proList.get(a).setDelivery_Check(infoList.get(a).getDelivery_Check());
-			System.out.println(proList);
-				}
-		
+			return mybidingList;
 		}
 
-		return proList;
-		
-	}
+
 
 	// 낙찰 정보들에 대해 리스트로 만들어 프론트로 리턴한다.
 	@GetMapping("/mypage/bid/{memid}")
@@ -120,6 +101,7 @@ public class MypageController {
 			}
 		}
 		System.out.println(dateList);
+		
 		
 		//날짜가 제일 늦은날짜가 인덱스 맨뒤에 온다.
 		List<Winning_bid> bidList = mypageService.selectDeadPro(dateList.get(dateList.size()-1));
